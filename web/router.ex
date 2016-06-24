@@ -19,6 +19,10 @@ defmodule ToDoManager.Router do
     get "/", PageController, :index
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
+
+    resources "/lists", ListController do
+      resources "/tasks", TaskController
+    end
   end
 
   # Other scopes may use custom stacks.
