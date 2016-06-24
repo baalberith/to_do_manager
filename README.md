@@ -3,6 +3,7 @@
 To start your Phoenix app:
 
   * Install dependencies with `mix deps.get`
+  * Set postgres user password to 'postgres' `sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"` and restart postgres service `sudo service postgresql restart`
   * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
   * Install Node.js dependencies with `npm install`
   * Start Phoenix endpoint with `mix phoenix.server`
