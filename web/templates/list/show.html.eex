@@ -1,23 +1,37 @@
-<h2>Show list</h2>
+<h3><%= @list.name %></h3>
 
-<ul>
+<%= form_for ToDoManager.List.changeset(@list), list_path(@conn, :delete_tasks, @list.id), [method: :delete], fn f -> %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Task Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for task <- @list.tasks do %>
+      <tr>
+        <td>
+          <%= checkbox f, String.to_atom("#{task.id}") %>
+          <%= task.name %>
+        </td>
+        <td class="text-right">
+          [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
+          <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task), class: "btn btn-danger btn-xs" %>
+          <%# link "Delete", to: list_task_path(@conn, :delete, @list.id, task), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th><%= submit "Delete Selected" %></th>
+      <th></th>
+    </tr>
+  </tfoot>
+</table>
 
-  <li>
-    <strong>Name:</strong>
-    <%= @list.name %>
-    <ul>
-        <%= for task <- @list.tasks do %>
-            <li>
-                <%= task.name %>
-                [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
-                <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task) %>
-                <%= link "Delete", to: list_task_path(@conn, :delete, @list.id, task), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
-            </li>
-        <% end %>
-    </ul>
-  </li>
-
-</ul>
+<% end %>
 
 <%= link "Edit", to: list_path(@conn, :edit, @list) %>
 <%= link "Back", to: list_path(@conn, :index) %>

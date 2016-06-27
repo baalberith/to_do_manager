@@ -45,7 +45,7 @@ defmodule ToDoManager.TaskController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id, "task" => task}) do
     task = Repo.get!(Task, id)
     Repo.delete!(task)
 

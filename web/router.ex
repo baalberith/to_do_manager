@@ -23,6 +23,8 @@ defmodule ToDoManager.Router do
     resources "/lists", ListController do
       resources "/tasks", TaskController
     end
+
+    delete "/lists/:id/delete_tasks", ListController, :delete_tasks
   end
 
   # Other scopes may use custom stacks.
