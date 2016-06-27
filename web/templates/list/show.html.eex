@@ -1,6 +1,7 @@
 <h3><%= @list.name %></h3>
 
-<%= form_for ToDoManager.List.changeset(@list), list_path(@conn, :delete_tasks, @list.id), [method: :delete], fn f -> %>
+<%= if @list.tasks != [] do %>
+<%= form_for @conn, list_task_path(@conn, :delete_tasks, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
 <table class="table">
   <thead>
     <tr>
@@ -30,7 +31,7 @@
     </tr>
   </tfoot>
 </table>
-
+<% end %>
 <% end %>
 
 <%= link "Edit", to: list_path(@conn, :edit, @list) %>

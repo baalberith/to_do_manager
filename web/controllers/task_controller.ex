@@ -46,11 +46,29 @@ defmodule ToDoManager.TaskController do
   end
 
   def delete(conn, %{"id" => id, "task" => task}) do
-    task = Repo.get!(Task, id)
-    Repo.delete!(task)
+      task = Repo.get!(Task, id)
+      Repo.delete!(task)
+
+      conn
+      |> put_flash(:info, "Task deleted subbessfully.")
+      |> redirect(to: list_path(conn, :show, task.list_id))
+  end
+  def delete(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
+    for {task_id, to_delete} <- tasks_to_delete do
+      if to_delete == "true" do
+        task = Repo.get!(ToDoManager.Task, String.to_integer(task_id))
+        Repo.delete!(task)
+      end
+    end
 
     conn
-    |> put_flash(:info, "Task deleted subbessfully.")
-    |> redirect(to: list_path(conn, :show, task.list_id))
+    |> put_flash(:info, "Tasks deleted successfully.")
+    |> redirect(to: list_path(conn, :show, list_id))
+  end
+
+  def delete(conn, %{"list_id" => list_id}) do
+    conn
+    |> put_flash(:info, "No tasks do delete.")
+    |> redirect(to: list_path(conn, :show, list_id))
   end
 end

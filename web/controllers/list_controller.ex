@@ -65,23 +65,4 @@ defmodule ToDoManager.ListController do
     |> put_flash(:info, "List deleted successfully.")
     |> redirect(to: list_path(conn, :index))
   end
-
-  def delete_tasks(conn, %{"id" => id, "list" => tasks_to_delete}) do
-    for {task_id, to_delete} <- tasks_to_delete do
-      if to_delete == "true" do
-        task = Repo.get!(ToDoManager.Task, String.to_integer(task_id))
-        Repo.delete!(task)
-      end
-    end
-
-    conn
-    |> put_flash(:info, "Tasks deleted successfully.")
-    |> redirect(to: list_path(conn, :show, id))
-  end
-
-  def delete_tasks(conn, %{"id" => id}) do
-    conn
-    |> put_flash(:info, "No tasks do delete.")
-    |> redirect(to: list_path(conn, :show, id))
-  end
 end
