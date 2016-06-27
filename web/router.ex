@@ -22,7 +22,7 @@ defmodule ToDoManager.Router do
 
     resources "/lists", ListController do
       resources "/tasks", TaskController
-      delete "/tasks/delete_tasks", TaskController, :delete_tasks
+      delete "/tasks/selected", TaskController, :delete_tasks
     end
   end
 
