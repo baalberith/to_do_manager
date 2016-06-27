@@ -29,7 +29,7 @@ defmodule ToDoManager.ListController do
   end
 
   def show(conn, %{"id" => id}) do
-    list = Repo.get!(List, id)
+    list = List |> Repo.get!(id) |> Repo.preload([:tasks])
     render(conn, "show.html", list: list)
   end
 

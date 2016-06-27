@@ -9,7 +9,7 @@ defmodule ToDoManager.Task do
     timestamps
   end
 
-  @required_fields ~w(name date)
+  @required_fields ~w(name date list_id)
   @optional_fields ~w()
 
   @doc """

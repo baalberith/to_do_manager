@@ -5,9 +5,20 @@
   <li>
     <strong>Name:</strong>
     <%= @list.name %>
+    <ul>
+        <%= for task <- @list.tasks do %>
+            <li>
+                <%= task.name %>
+                [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
+                <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task) %>
+                <%= link "Delete", to: list_task_path(@conn, :delete, @list.id, task), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+            </li>
+        <% end %>
+    </ul>
   </li>
 
 </ul>
 
 <%= link "Edit", to: list_path(@conn, :edit, @list) %>
 <%= link "Back", to: list_path(@conn, :index) %>
+<%= link "New task", to: list_task_path(@conn, :new, @list) %>
