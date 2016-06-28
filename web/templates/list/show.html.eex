@@ -17,7 +17,7 @@
           <%= task.name %>
         </td>
         <td class="text-right">
-          [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
+          [ Due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
           <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
           <%= link "Delete", to: task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => %{"#{task.id}" => "true"}}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
         </td>
