@@ -1,7 +1,7 @@
 <h3><%= @list.name %></h3>
 
 <%= if @list.tasks != [] do %>
-<%= form_for @conn, task_path(@conn, :delete_tasks, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
+<%= form_for @conn, task_path(@conn, :delete, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
 <table class="table">
   <thead>
     <tr>
@@ -19,7 +19,7 @@
         <td class="text-right">
           [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
           <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
-          <%= link "Delete", to: task_path(@conn, :delete, @list.id, task.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+          <%= link "Delete", to: task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => %{"#{task.id}" => "true"}}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
         </td>
       </tr>
     <% end %>
