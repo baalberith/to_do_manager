@@ -1,7 +1,7 @@
 <h3><%= @list.name %></h3>
 
 <%= if @list.tasks != [] do %>
-<%= form_for @conn, list_task_path(@conn, :delete_tasks, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
+<%= form_for @conn, task_path(@conn, :delete_tasks, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
 <table class="table">
   <thead>
     <tr>
@@ -18,8 +18,8 @@
         </td>
         <td class="text-right">
           [ due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
-          <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task), class: "btn btn-danger btn-xs" %>
-          <%# link "Delete", to: list_task_path(@conn, :delete, @list.id, task), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+          <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
+          <%= link "Delete", to: task_path(@conn, :delete, @list.id, task.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
         </td>
       </tr>
     <% end %>
@@ -32,7 +32,7 @@
   </tfoot>
 </table>
 <% end %>
-<% end %>
+<%  end %>
 
 <%= link "Edit", to: list_path(@conn, :edit, @list) %>
 <%= link "Back", to: list_path(@conn, :index) %>

@@ -45,9 +45,18 @@ defmodule ToDoManager.TaskController do
         render(conn, "edit.html", changeset: changeset, task: task)
     end
   end
-  
-  def delete(conn, %{"id" => "selected", "list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
-    for {task_id, to_delete} <- tasks_to_delete, to_delete == "true" do
+
+  def delete(conn, %{"id" => id}) do
+    task = Repo.get!(Task, id)
+    Repo.delete!(task)
+
+    conn
+    |> put_flash(:info, "Task deleted subbessfully.")
+    |> redirect(to: list_path(conn, :show, task.list_id))
+  end
+
+  def delete_tasks(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
+    for {task_id, "true"} <- tasks_to_delete do
       task = Repo.get!(Task, String.to_integer(task_id))
       Repo.delete!(task)
     end
@@ -57,18 +66,9 @@ defmodule ToDoManager.TaskController do
     |> redirect(to: list_path(conn, :show, list_id))
   end
 
-# def delete(conn, %{"list_id" => list_id}) do
+# def delete_tasks(conn, %{"list_id" => list_id}) do
 #   conn
 #   |> put_flash(:info, "No tasks do delete.")
 #   |> redirect(to: list_path(conn, :show, list_id))
 # end
-
-  def delete(conn, %{"id" => id, "task" => task}) do
-    task = Repo.get!(Task, id)
-    Repo.delete!(task)
-
-    conn
-    |> put_flash(:info, "Task deleted subbessfully.")
-    |> redirect(to: list_path(conn, :show, task.list_id))
-  end
 end
