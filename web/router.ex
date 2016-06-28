@@ -16,9 +16,7 @@ defmodule ToDoManager.Router do
   scope "/", ToDoManager do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
-    get "/hello", HelloController, :index
-    get "/hello/:messenger", HelloController, :show
+    get "/", ListController, :index
 
     delete "/list/:list_id/tasks/:id", TaskController, :delete
     delete "/list/:list_id/tasks", TaskController, :delete_tasks
