@@ -1,7 +1,6 @@
 <h3><%= @list.name %></h3>
 
 <%= if @list.tasks != [] do %>
-<%= form_for @conn, task_path(@conn, :delete, @list.id), [method: :delete, as: :tasks_to_delete], fn f -> %>
 <table class="table">
   <thead>
     <tr>
@@ -13,26 +12,25 @@
     <%= for task <- @list.tasks do %>
       <tr>
         <td>
-          <%= checkbox f, String.to_atom("#{task.id}") %>
+          <input id="tasks_to_delete_<%= "#{task.id}" %>" name="tasks_to_delete[]" value="<%= "#{task.id}" %>" type="checkbox">
           <%= task.name %>
         </td>
         <td class="text-right">
           [ Due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
           <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
-          <%= link "Delete", to: task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => %{"#{task.id}" => "true"}}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+          <%= link "Delete", to: task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => ["#{task.id}"]}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
         </td>
       </tr>
     <% end %>
   </tbody>
   <tfoot>
     <tr>
-      <th><%= submit "Delete Selected" %></th>
+      <th><%= submit "Delete Selected", id: "delete_selected" %></th>
       <th></th>
     </tr>
   </tfoot>
 </table>
 <% end %>
-<%  end %>
 
 <%= link "Edit", to: list_path(@conn, :edit, @list) %>
 <%= link "Back", to: list_path(@conn, :index) %>

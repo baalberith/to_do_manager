@@ -12,8 +12,33 @@
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
+import $ from "jquery"
 
-alert("Hello")
+(function( $ ){
+  $.fn.checkedValues = function() {
+    return $.map( this, function (elem) {
+      if (elem.checked) {
+        return elem.value;
+      }
+    });
+  }
+})( $ );
+
+$('#delete_selected').click(function(){
+  var tasks = $(":checkbox").checkedValues();
+  var path = $(location).attr('pathname') + '/tasks';
+  var csrf = $("meta[name=csrf]").attr('content');
+  $.ajax({
+    url: path,
+    type: 'POST',
+    data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
+    success: function (data) {
+      console.log(data);
+      $("html").html(data);
+    }
+  });
+});
+
 // Import local files
 //
 // Local files can be imported directly using relative
