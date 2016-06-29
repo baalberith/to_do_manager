@@ -46,9 +46,21 @@ defmodule ToDoManager.TaskController do
     end
   end
 
+  def complete(conn, %{"list_id" => list_id, "tasks_to_complete" => tasks_to_complete}) do
+    Logger.debug "Tasks: #{inspect(tasks_to_complete)}"
+    for task_id <- tasks_to_complete do
+      task = Repo.get!(Task, String.to_integer(task_id))
+      # changeset = Task.changeset(task, %{"completed" => "true"})
+      completed_task = %{task | completed: true}
+      Repo.update!(completed_task)
+    end
+
+    conn
+    |> put_flash(:info, "Tasks updated successfully.")
+    |> redirect(to: list_path(conn, :show, list_id))
+  end
 
   def delete(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
-    Logger.debug "Tasks: #{inspect(tasks_to_delete)}"
     for task_id <- tasks_to_delete do
       task = Repo.get!(Task, String.to_integer(task_id))
       Repo.delete!(task)
@@ -61,7 +73,7 @@ defmodule ToDoManager.TaskController do
 
   def delete(conn, %{"list_id" => list_id}) do
     conn
-    |> put_flash(:info, "No task to delete.")
+    |> put_flash(:info, "Nothing to delete.")
     |> redirect(to: list_path(conn, :show, list_id))
   end
 

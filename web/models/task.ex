@@ -4,12 +4,13 @@ defmodule ToDoManager.Task do
   schema "tasks" do
     field :name, :string
     field :date, Ecto.DateTime
+    field :completed, :boolean, default: false
     belongs_to :list, ToDoManager.List
 
     timestamps
   end
 
-  @required_fields ~w(name date list_id)
+  @required_fields ~w(name date list_id completed)
   @optional_fields ~w()
 
   @doc """

@@ -4,6 +4,8 @@
 <table class="table">
   <thead>
     <tr>
+        <th>Delete</th>
+        <th>Complete</th>
       <th>Task Name</th>
       <th></th>
     </tr>
@@ -12,20 +14,30 @@
     <%= for task <- @list.tasks do %>
       <tr>
         <td>
-          <input id="tasks_to_delete_<%= "#{task.id}" %>" name="tasks_to_delete[]" value="<%= "#{task.id}" %>" type="checkbox">
-          <%= task.name %>
+            <input id="tasks_to_delete_<%= "#{task.id}" %>" name="tasks_to_delete[]" value="<%= "#{task.id}" %>" type="checkbox" class="tasks_to_delete"></td>
+            <td><input id="tasks_to_complete_<%= "#{task.id}" %>" name="tasks_to_complete[]" value="<%= "#{task.id}" %>" type="checkbox" class="tasks_to_complete"></td>
+            <td><%= task.name %></td>
         </td>
         <td class="text-right">
-          [ Due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
-          <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
-          <%= link "Delete", to: task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => ["#{task.id}"]}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
-        </td>
+<%= if task.completed do %>
+[ Completed:  <%= task.updated_at |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
+            <%= else %>
+[ Due to:  <%= task.date |> Ecto.DateTime.to_date |> Ecto.Date.to_string %>]
+
+                <%= link "Complete", to: list_task_path(@conn, :update, @list.id, task.id, %{"task" => %{"completed" => "true"}}), method: :patch, class: "btn btn-danger btn-xs" %>
+                <% end %>
+
+                    <%= link "Edit", to: list_task_path(@conn, :edit, @list.id, task.id), class: "btn btn-danger btn-xs" %>
+          <%= link "Delete", to: list_task_path(@conn, :delete, @list.id, %{"tasks_to_delete" => ["#{task.id}"]}), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+                    </td>
       </tr>
     <% end %>
   </tbody>
   <tfoot>
     <tr>
-      <th><%= submit "Delete Selected", id: "delete_selected" %></th>
+      <th><%= submit "OK", id: "delete_selected" %></th>
+      <th><%= submit "OK", id: "complete_selected" %></th>
+      <th></th>
       <th></th>
     </tr>
   </tfoot>
