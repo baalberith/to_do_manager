@@ -26,22 +26,21 @@ import $ from "jquery"
 
 $('#delete_selected').click(function(){
   var tasks = $(".tasks_to_delete").checkedValues();
-  var path = $(location).attr('pathname') + '/tasks';
+  var path = $(location).attr('pathname') + '/tasks/delete_tasks';
   var csrf = $("meta[name=csrf]").attr('content');
   $.ajax({
     url: path,
     type: 'POST',
     data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
     success: function (data) {
-      $('body').html(data.replace(/<body>(.*)<\/body>/, "$1"));
-      // $('html').html(data);
+      $('html').html(data);
     }
   });
 });
 
 $('#complete_selected').click(function(){
   var tasks = $(".tasks_to_complete").checkedValues();
-  var path = $(location).attr('pathname') + '/tasks/complete';
+  var path = $(location).attr('pathname') + '/tasks/complete_tasks';
   var csrf = $("meta[name=csrf]").attr('content');
   $.ajax({
     url: path,

@@ -19,9 +19,9 @@ defmodule ToDoManager.Router do
     get "/", ListController, :index
 
     resources "/lists", ListController do
-      patch "/tasks/complete", TaskController, :complete
-      delete "/tasks", TaskController, :delete
-      resources "/tasks", TaskController, except: [:delete]
+      patch "/tasks/complete_tasks", TaskController, :complete_tasks
+      delete "/tasks/delete_tasks", TaskController, :delete_tasks
+      resources "/tasks", TaskController
     end
   end
 
