@@ -33,8 +33,8 @@ $('#delete_selected').click(function(){
     type: 'POST',
     data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
     success: function (data) {
-      // $('body').html(data.replace(/<body>(.*)<\/body>/, "$1"));
-      $('html').html(data);
+      $('body').html(data.replace(/<body>(.*)<\/body>/, "$1"));
+      // $('html').html(data);
     }
   });
 });

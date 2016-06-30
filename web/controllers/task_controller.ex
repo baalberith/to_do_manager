@@ -47,12 +47,9 @@ defmodule ToDoManager.TaskController do
   end
 
   def complete(conn, %{"list_id" => list_id, "tasks_to_complete" => tasks_to_complete}) do
-    Logger.debug "Tasks: #{inspect(tasks_to_complete)}"
     for task_id <- tasks_to_complete do
       task = Repo.get!(Task, String.to_integer(task_id))
-      # changeset = Task.changeset(task, %{"completed" => "true"})
-      completed_task = %{task | completed: true}
-      Repo.update!(completed_task)
+      Repo.update!(%{task | completed: true})
     end
 
     conn
