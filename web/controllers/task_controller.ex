@@ -63,15 +63,11 @@ defmodule ToDoManager.TaskController do
       Repo.update!(%{task | completed: true})
     end
 
-    conn
-    |> put_flash(:info, "Tasks updated successfully.")
-    |> json %{location: list_path(conn, :show, list_id)}
+    json conn, %{location: list_path(conn, :show, list_id), info: "Tasks completed successfully."}
   end
 
   def complete_tasks(conn, %{"list_id" => list_id}) do
-    conn
-    |> put_flash(:info, "Nothing to complete.")
-    |> json %{location: list_path(conn, :show, list_id)}
+    json conn, %{location: list_path(conn, :show, list_id), info: "Nothing to complete.."}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
@@ -80,15 +76,11 @@ defmodule ToDoManager.TaskController do
       Repo.delete!(task)
     end
 
-    conn
-    |> put_flash(:info, "Tasks deleted successfully.")
-    |> json %{location: list_path(conn, :show, list_id)}
+    json conn, %{location: list_path(conn, :show, list_id), info: "Tasks deleted successfully."}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id}) do
-    conn
-    |> put_flash(:info, "Nothing to delete.")
-    |> json %{location: list_path(conn, :show, list_id)}
+    json conn, %{location: list_path(conn, :show, list_id), info: "Nothing to delete."}
   end
 
 end

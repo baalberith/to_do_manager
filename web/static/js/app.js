@@ -14,16 +14,6 @@
 import "phoenix_html"
 import $ from "jquery"
 
-// (function( $ ){
-//   $.fn.checkedValues = function() {
-//     return $.map( this, function (elem) {
-//       if (elem.checked) {
-//         return elem.value;
-//       }
-//     });
-//   }
-// })( $ );
-
 $('#delete_selected').click(function(){
   if (confirm("Are you sure?")) {
     var tasks = $("input[name='tasks_to_delete[]']:checked").map(function () { return this.value; }).get();
@@ -32,10 +22,10 @@ $('#delete_selected').click(function(){
     $.ajax({
       url: path,
       type: 'POST',
-      data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
-      success: function (data) {
-        window.location = data.location;
-      }
+      data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
+    }).done( function (data) {
+      window.location = data.location;
+      $("#info").html(data.info);
     });
   }
 });
@@ -47,10 +37,10 @@ $('#complete_selected').click(function(){
   $.ajax({
     url: path,
     type: 'POST',
-    data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks },
-    success: function (data) {
-      window.location = data.location;
-    }
+    data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks }
+  }).done( function (data) {
+    window.location = data.location;
+    $("#info").html(data.info);
   });
 });
 
