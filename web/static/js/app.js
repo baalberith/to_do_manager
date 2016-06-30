@@ -14,19 +14,19 @@
 import "phoenix_html"
 import $ from "jquery"
 
-(function( $ ){
-  $.fn.checkedValues = function() {
-    return $.map( this, function (elem) {
-      if (elem.checked) {
-        return elem.value;
-      }
-    });
-  }
-})( $ );
+// (function( $ ){
+//   $.fn.checkedValues = function() {
+//     return $.map( this, function (elem) {
+//       if (elem.checked) {
+//         return elem.value;
+//       }
+//     });
+//   }
+// })( $ );
 
 $('#delete_selected').click(function(){
   if (confirm("Are you sure?")) {
-    var tasks = $(".tasks_to_delete").checkedValues();
+    var tasks = $("input[name='tasks_to_delete[]']:checked").map(function () { return this.value; }).get();
     var path = $(location).attr('pathname') + '/tasks/delete_tasks';
     var csrf = $("meta[name=csrf]").attr('content');
     $.ajax({
@@ -41,7 +41,7 @@ $('#delete_selected').click(function(){
 });
 
 $('#complete_selected').click(function(){
-  var tasks = $(".tasks_to_complete").checkedValues();
+  var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();
   var path = $(location).attr('pathname') + '/tasks/complete_tasks';
   var csrf = $("meta[name=csrf]").attr('content');
   $.ajax({

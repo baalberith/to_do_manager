@@ -13,8 +13,8 @@
         <tbody>
             <%= for task <- @list.tasks do %>
                 <tr>
-                    <td><input id="tasks_to_delete_<%= "#{task.id}" %>" name="tasks_to_delete[]" value="<%= "#{task.id}" %>" type="checkbox" class="tasks_to_delete"></td>
-                    <td><input id="tasks_to_complete_<%= "#{task.id}" %>" name="tasks_to_complete[]" value="<%= "#{task.id}" %>" type="checkbox" class="tasks_to_complete"></td>
+                    <td><input id="tasks_to_delete_<%= "#{task.id}" %>" name="tasks_to_delete[]" value="<%= "#{task.id}" %>" type="checkbox"></td>
+                    <td><input id="tasks_to_complete_<%= "#{task.id}" %>" name="tasks_to_complete[]" value="<%= "#{task.id}" %>" type="checkbox"></td>
                     <td><%= task.name %></td>
                     <td class="text-right">
                         <%= if task.completed do %>
