@@ -25,17 +25,19 @@ import $ from "jquery"
 })( $ );
 
 $('#delete_selected').click(function(){
-  var tasks = $(".tasks_to_delete").checkedValues();
-  var path = $(location).attr('pathname') + '/tasks/delete_tasks';
-  var csrf = $("meta[name=csrf]").attr('content');
-  $.ajax({
-    url: path,
-    type: 'POST',
-    data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
-    success: function (data) {
-      window.location = data.location;
-    }
-  });
+  if (confirm("Are you sure?")) {
+    var tasks = $(".tasks_to_delete").checkedValues();
+    var path = $(location).attr('pathname') + '/tasks/delete_tasks';
+    var csrf = $("meta[name=csrf]").attr('content');
+    $.ajax({
+      url: path,
+      type: 'POST',
+      data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
+      success: function (data) {
+        window.location = data.location;
+      }
+    });
+  }
 });
 
 $('#complete_selected').click(function(){
