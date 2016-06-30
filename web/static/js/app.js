@@ -38,10 +38,7 @@ $('#delete_selected').click(function(){
       type: 'POST',
       data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
     }).done( function (data) {
-      $(location).attr('href', data.location);
-      var a = $("#info").val(data.info);
-      console.log(a);
-      // window.location = data.location;
+      window.location = data.location;
       $("#info").html(data.info);
     });
   }

@@ -83,7 +83,7 @@ defmodule ToDoManager.TaskController do
 
   def delete_tasks(conn, %{"list_id" => list_id}) do
     conn
-    |> put_flash(:info, "Task deleted successfully.")
+    |> put_flash(:info, "Nothing to delete.")
     |> json %{location: list_path(conn, :show, list_id), info: "Nothing to delete."}
   end
 
