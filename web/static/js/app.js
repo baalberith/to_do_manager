@@ -33,7 +33,7 @@ $('#delete_selected').click(function(){
     type: 'POST',
     data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks },
     success: function (data) {
-      $('html').html(data);
+      window.location = data.location;
     }
   });
 });
@@ -47,8 +47,7 @@ $('#complete_selected').click(function(){
     type: 'POST',
     data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks },
     success: function (data) {
-      // $('body').html(data.replace(/<body>(.*)<\/body>/, "$1"));
-      $('html').html(data);
+      window.location = data.location;
     }
   });
 });

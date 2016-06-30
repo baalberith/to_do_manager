@@ -65,13 +65,13 @@ defmodule ToDoManager.TaskController do
 
     conn
     |> put_flash(:info, "Tasks updated successfully.")
-    |> redirect(to: list_path(conn, :show, list_id))
+    |> json %{location: list_path(conn, :show, list_id)}
   end
 
   def complete_tasks(conn, %{"list_id" => list_id}) do
     conn
     |> put_flash(:info, "Nothing to complete.")
-    |> redirect(to: list_path(conn, :show, list_id))
+    |> json %{location: list_path(conn, :show, list_id)}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
@@ -82,13 +82,13 @@ defmodule ToDoManager.TaskController do
 
     conn
     |> put_flash(:info, "Tasks deleted successfully.")
-    |> redirect(to: list_path(conn, :show, list_id))
+    |> json %{location: list_path(conn, :show, list_id)}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id}) do
     conn
     |> put_flash(:info, "Nothing to delete.")
-    |> redirect(to: list_path(conn, :show, list_id))
+    |> json %{location: list_path(conn, :show, list_id)}
   end
 
 end
