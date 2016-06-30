@@ -76,11 +76,15 @@ defmodule ToDoManager.TaskController do
       Repo.delete!(task)
     end
 
-    json conn, %{location: list_path(conn, :show, list_id), info: "Tasks deleted successfully."}
+    conn
+    |> put_flash(:info, "Task deleted successfully.")
+    |> json %{location: list_path(conn, :show, list_id), info: "Tasks deleted successfully."}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id}) do
-    json conn, %{location: list_path(conn, :show, list_id), info: "Nothing to delete."}
+    conn
+    |> put_flash(:info, "Task deleted successfully.")
+    |> json %{location: list_path(conn, :show, list_id), info: "Nothing to delete."}
   end
 
 end

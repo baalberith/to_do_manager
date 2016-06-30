@@ -14,22 +14,6 @@
 import "phoenix_html"
 import $ from "jquery"
 
-$('#delete_selected').click(function(){
-  if (confirm("Are you sure?")) {
-    var tasks = $("input[name='tasks_to_delete[]']:checked").map(function () { return this.value; }).get();
-    var path = $(location).attr('pathname') + '/tasks/delete_tasks';
-    var csrf = $("meta[name=csrf]").attr('content');
-    $.ajax({
-      url: path,
-      type: 'POST',
-      data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
-    }).done( function (data) {
-      window.location = data.location;
-      $("#info").html(data.info);
-    });
-  }
-});
-
 $('#complete_selected').click(function(){
   var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();
   var path = $(location).attr('pathname') + '/tasks/complete_tasks';
@@ -42,6 +26,25 @@ $('#complete_selected').click(function(){
     window.location = data.location;
     $("#info").html(data.info);
   });
+});
+
+$('#delete_selected').click(function(){
+  if (confirm("Are you sure?")) {
+    var tasks = $("input[name='tasks_to_delete[]']:checked").map(function () { return this.value; }).get();
+    var path = $(location).attr('pathname') + '/tasks/delete_tasks';
+    var csrf = $("meta[name=csrf]").attr('content');
+    $.ajax({
+      url: path,
+      type: 'POST',
+      data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
+    }).done( function (data) {
+      $(location).attr('href', data.location);
+      var a = $("#info").val(data.info);
+      console.log(a);
+      // window.location = data.location;
+      $("#info").html(data.info);
+    });
+  }
 });
 
 // Import local files
