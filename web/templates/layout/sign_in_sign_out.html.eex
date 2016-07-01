@@ -1,6 +1,6 @@
 <%= if logged_in?(@conn) do %>
     <%= link "Sign out", to: session_path(@conn, :delete, :access), method: :delete, class: "btn btn-danger" %>
-    <%= link "Delete Account", to: user_path(@conn, :delete, current_user(@conn)), method: :delete, class: "btn btn-danger" %><br>
+    <%= link "Delete Account", to: user_path(@conn, :delete, current_user(@conn)), method: :delete, class: "btn btn-danger" %>
   <%= current_user(@conn).email %>
 <% else %>
   <%= link "Create new account", to: user_path(@conn, :new), class: "btn btn-danger" %>

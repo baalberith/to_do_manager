@@ -13,7 +13,6 @@ defmodule ToDoManager.TaskController do
   end
 
   def create(conn, %{"list_id" => list_id, "task" => task_params}) do
-    #changeset = Task.changeset(%Task{}, Map.put_new(task_params, "list_id", list_id))
     changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
 
     case Repo.insert(changeset) do
