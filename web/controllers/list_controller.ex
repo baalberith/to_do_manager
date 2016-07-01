@@ -7,7 +7,10 @@ defmodule ToDoManager.ListController do
   plug :scrub_params, "list" when action in [:create, :update]
 
   def index(conn, _params) do
-    lists = Repo.all(List)
+    # lists = Repo.all(List)
+    # render(conn, "index.html", lists: lists)
+    user = Guardian.Plug.current_resource(conn)
+    lists = Repo.all(my_lists(user))
     render(conn, "index.html", lists: lists)
   end
 
@@ -47,7 +50,10 @@ defmodule ToDoManager.ListController do
   end
 
   def show(conn, %{"id" => id}) do
-    list = List |> Repo.get!(id) |> Repo.preload([:tasks])
+    # list = List |> Repo.get!(id) |> Repo.preload([:tasks])
+    # render(conn, "show.html", list: list)
+    user = Guardian.Plug.current_resource(conn)
+    list = Repo.get!(my_lists(user), id) |> Repo.preload([:tasks])
     render(conn, "show.html", list: list)
   end
 
@@ -73,13 +79,14 @@ defmodule ToDoManager.ListController do
 
   def delete(conn, %{"id" => id}) do
     list = Repo.get!(List, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
     Repo.delete!(list)
 
     conn
     |> put_flash(:info, "List deleted successfully.")
     |> redirect(to: list_path(conn, :index))
+  end
+
+  defp my_lists(user) do
+    assoc(user, :lists)
   end
 end
