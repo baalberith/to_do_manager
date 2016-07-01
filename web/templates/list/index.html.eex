@@ -4,7 +4,6 @@
   <thead>
     <tr>
       <th>List Name</th>
-
       <th></th>
     </tr>
   </thead>
@@ -12,7 +11,6 @@
 <%= for list <- @lists do %>
     <tr>
       <td><%= list.name %></td>
-
       <td class="text-right">
         <%= link "Show", to: list_path(@conn, :show, list), class: "btn btn-default btn-xs" %>
         <%= link "Edit", to: list_path(@conn, :edit, list), class: "btn btn-default btn-xs" %>

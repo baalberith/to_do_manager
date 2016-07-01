@@ -12,15 +12,32 @@ defmodule ToDoManager.ListController do
   end
 
   def new(conn, _params) do
-    changeset = List.changeset(%List{})
+    # changeset = List.changeset(%List{})
+    # render(conn, "new.html", changeset: changeset)
+    changeset = Guardian.Plug.current_resource(conn)
+    |> build_assoc(:lists)
+    |> List.changeset()
+
     render(conn, "new.html", changeset: changeset)
   end
 
   def create(conn, %{"list" => list_params}) do
-    changeset = List.changeset(%List{}, list_params)
+    # changeset = List.changeset(%List{}, list_params)
+
+    # case Repo.insert(changeset) do
+    #   {:ok, _list} ->
+    #     conn
+    #     |> put_flash(:info, "List created successfully.")
+    #     |> redirect(to: list_path(conn, :index))
+    #   {:error, changeset} ->
+    #     render(conn, "new.html", changeset: changeset)
+    # end
+    changeset = Guardian.Plug.current_resource(conn)
+    |> build_assoc(:lists)
+    |> List.changeset(list_params)
 
     case Repo.insert(changeset) do
-      {:ok, _list} ->
+      {:ok, _todo} ->
         conn
         |> put_flash(:info, "List created successfully.")
         |> redirect(to: list_path(conn, :index))

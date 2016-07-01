@@ -4,6 +4,7 @@ defmodule ToDoManager.List do
   schema "lists" do
     field :name, :string
     has_many :tasks, ToDoManager.Task
+    belongs_to :user, ToDoManager.User
 
     timestamps
   end
