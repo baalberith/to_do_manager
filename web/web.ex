@@ -52,6 +52,7 @@ defmodule ToDoManager.Web do
       import ToDoManager.Router.Helpers
       import ToDoManager.ErrorHelpers
       import ToDoManager.Gettext
+      import ToDoManager.ViewHelper
     end
   end
 
