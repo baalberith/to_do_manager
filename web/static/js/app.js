@@ -13,6 +13,19 @@
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
 import $ from "jquery"
+// import React from "react"
+// import ReactDOM from "react-dom"
+
+// class HelloWorld extends React.Component {
+//   render() {
+//     return (<h1>Hello World!</h1>)
+//   }
+// }
+
+// ReactDOM.render(
+//     <HelloWorld/>,
+//   document.getElementById("hello-world")
+// )
 
 $('#complete_selected').click(function(){
   var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();
@@ -23,7 +36,8 @@ $('#complete_selected').click(function(){
     type: 'POST',
     data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks }
   }).done( function (data) {
-    window.location = data.location;
+    // window.location = data.location;
+    $(location).attr('pathname', data.location);
     $("#info").html(data.info);
   });
 });
@@ -38,7 +52,8 @@ $('#delete_selected').click(function(){
       type: 'POST',
       data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
     }).done( function (data) {
-      window.location = data.location;
+      // window.location = data.location;
+      $(location).attr('pathname', data.location);
       $("#info").html(data.info);
     });
   }

@@ -37,64 +37,62 @@ defmodule ToDoManager.ListController do
 
   def show(conn, %{"id" => id}) do
     user = Guardian.Plug.current_resource(conn)
-    list = Repo.get!(List, id)
-    if list.user_id == user.id do
-      list_with_tasks = Repo.preload(list, [:tasks])
-      render(conn, "show.html", list: list_with_tasks)
-    else
-      conn
-      |> put_flash(:error, "Not your list")
-      |> redirect(to: list_path(conn, :index))
+    case Repo.get(my_lists(user), id) do
+      nil ->
+        conn
+        |> put_flash(:error, "Not your list.")
+        |> redirect(to: list_path(conn, :index))
+      list ->
+        render(conn, "show.html", list: Repo.preload(list, [:tasks]))
     end
   end
 
   def edit(conn, %{"id" => id}) do
     user = Guardian.Plug.current_resource(conn)
-    list = Repo.get!(List, id)
-    if list.user_id == user.id do
-      changeset = List.changeset(list)
-      render(conn, "edit.html", list: list, changeset: changeset)
-    else
-      conn
-      |> put_flash(:error, "Not your list")
-      |> redirect(to: list_path(conn, :index))
+    case Repo.get(my_lists(user), id) do
+      nil ->
+        conn
+        |> put_flash(:error, "Not your list.")
+        |> redirect(to: list_path(conn, :index))
+      list ->
+        render(conn, "edit.html", list: list, changeset: List.changeset(list))
     end
   end
 
   def update(conn, %{"id" => id, "list" => list_params}) do
     user = Guardian.Plug.current_resource(conn)
-    list = Repo.get!(List, id)
-    if list.user_id == user.id do
-      changeset = List.changeset(list, list_params)
+    case Repo.get(my_lists(user), id) do
+      nil ->
+        conn
+        |> put_flash(:error, "Not your list.")
+        |> redirect(to: list_path(conn, :index))
+      list ->
+        changeset = List.changeset(list, list_params)
 
-      case Repo.update(changeset) do
-        {:ok, _list} ->
-          conn
-          |> put_flash(:info, "List updated successfully.")
-          |> redirect(to: list_path(conn, :index))
-        {:error, changeset} ->
-          render(conn, "edit.html", list: list, changeset: changeset)
-      end
-    else
-      conn
-      |> put_flash(:error, "Not your list")
-      |> redirect(to: list_path(conn, :index))
+        case Repo.update(changeset) do
+          {:ok, _list} ->
+            conn
+            |> put_flash(:info, "List updated successfully.")
+            |> redirect(to: list_path(conn, :index))
+          {:error, changeset} ->
+            render(conn, "edit.html", list: list, changeset: changeset)
+        end
     end
   end
 
   def delete(conn, %{"id" => id}) do
     user = Guardian.Plug.current_resource(conn)
-    list = Repo.get!(List, id)
-    if list.user_id == user.id do
-      Repo.delete!(list)
+    case Repo.get(my_lists(user), id) do
+      nil ->
+        conn
+        |> put_flash(:error, "Not your list.")
+        |> redirect(to: list_path(conn, :index))
+      list ->
+        Repo.delete!(list)
 
-      conn
-      |> put_flash(:info, "List deleted successfully.")
-      |> redirect(to: list_path(conn, :index))
-    else
-      conn
-      |> put_flash(:error, "Not your list")
-      |> redirect(to: list_path(conn, :index))
+        conn
+        |> put_flash(:info, "List deleted successfully.")
+        |> redirect(to: list_path(conn, :index))
     end
   end
 
