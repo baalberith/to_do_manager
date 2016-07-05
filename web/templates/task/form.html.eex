@@ -9,7 +9,7 @@
     <%= label f, :name, class: "control-label" %>
     <%= text_input f, :name, class: "form-control" %>
     <%= label f, :due_date, class: "control-label" %>
-    <%= datetime_select f, :date, class: "form-control" %>
+    <%= date_select f, :date, class: "form-control" %>
     <%= error_tag f, :name %>
   </div>
 

@@ -4,15 +4,15 @@ defmodule ToDoManager.Task do
 
   schema "tasks" do
     field :name, :string
-    field :date, Ecto.DateTime
+    field :date, Ecto.Date
     field :completed, :boolean, default: false
     belongs_to :list, ToDoManager.List
 
     timestamps
   end
 
-  @required_fields ~w(name date list_id completed)
-  @optional_fields ~w()
+  @required_fields ~w(name list_id completed)
+  @optional_fields ~w(date)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

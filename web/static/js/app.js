@@ -30,7 +30,7 @@ const Task = React.createClass({
 const List = React.createClass({
   getInitialState() {
     return {
-      tasks: this.props.tasks,
+      tasks: this.props.list.tasks,
       task: '',
     }
   },
@@ -39,7 +39,6 @@ const List = React.createClass({
     if (confirm("Are you sure?")) {
       var path = $(location).attr('pathname') + '/tasks/' + event.target.value;
       var csrf = $("meta[name=csrf]").attr('content');
-      console.log(event.target.id);
       $.ajax({
         url: path,
         type: 'POST',
@@ -60,21 +59,35 @@ const List = React.createClass({
     this.setState({task: event.target.value});
   },
   addTask(event) {
-    var item = {
-      id: 666,
-      name: this.state.task
+    var path = $(location).attr('pathname') + '/tasks';
+    var csrf = $("meta[name=csrf]").attr('content');
+    var new_task = {
+      name: this.state.task,
+      list_id: this.props.list.id,
+      completed: false
     };
-    this.setState({
-      tasks: this.state.tasks.concat([item]),
-      task: ''
+    $.ajax({
+      url: path,
+      type: 'POST',
+      data: { _csrf_token: csrf, task: new_task },
+      success: function(json) {
+        var data = JSON.parse(json);
+        this.setState({
+          tasks: this.state.tasks.concat([{id: data.id, name: data.name}]),
+          task: ''
+        });
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("Can't create new task.");
+      }.bind(this)
     });
 
     event.preventDefault();
   },
   render() {
     return (
-      <table key={this.props.id} className="table">
-        <caption>{this.props.name}</caption>
+      <table key={this.props.list.id} className="table">
+        <caption>{this.props.list.name}</caption>
         <thead><tr><th>Task</th><th></th></tr></thead>
         <tfoot><tr>
         <td></td>
@@ -98,10 +111,9 @@ const List = React.createClass({
 var list_props = $("#list-props").attr("data-props");
 if (list_props) {
   var data = JSON.parse(list_props);
-  console.log(data);
 
   ReactDOM.render(
-      <List name={data.name} tasks={data.tasks} />, $("#list-component")[0])
+      <List list={data} />, $("#list-component")[0])
 }
 
 // const { string } = React.PropTypes

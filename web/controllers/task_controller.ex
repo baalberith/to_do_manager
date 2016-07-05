@@ -16,15 +16,26 @@ defmodule ToDoManager.TaskController do
     changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
 
     case Repo.insert(changeset) do
-      {:ok, _task} ->
-        conn
-        |> put_flash(:info, "Task created successfully.")
-        |> redirect(to: list_path(conn, :show, list_id))
+      {:ok, task} ->
+        json conn, Poison.encode!(task)
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset, list_id: list_id)
     end
   end
-  
+
+  # def create(conn, %{"list_id" => list_id, "task" => task_params}) do
+  #   changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
+
+  #   case Repo.insert(changeset) do
+  #     {:ok, _task} ->
+  #       conn
+  #       |> put_flash(:info, "Task created successfully.")
+  #       |> redirect(to: list_path(conn, :show, list_id))
+  #     {:error, changeset} ->
+  #       render(conn, "new.html", changeset: changeset, list_id: list_id)
+  #   end
+  # end
+
   def edit(conn, %{"id" => id}) do
     task = Repo.get!(Task, id)
     changeset = Task.changeset(task)
