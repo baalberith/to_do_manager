@@ -1,5 +1,6 @@
 defmodule ToDoManager.List do
   use ToDoManager.Web, :model
+  @derive {Poison.Encoder, only: [:id, :name, :tasks, :user_id]}
 
   schema "lists" do
     field :name, :string
