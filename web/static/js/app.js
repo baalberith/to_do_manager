@@ -31,33 +31,60 @@ const List = React.createClass({
   getInitialState() {
     return {
       tasks: this.props.tasks,
+      task: '',
     }
   },
   deleteTask(event) {
-    console.log(event.target.id);
+    var taskIndex = parseInt(event.target.id, 10);
     if (confirm("Are you sure?")) {
       var path = $(location).attr('pathname') + '/tasks/' + event.target.value;
       var csrf = $("meta[name=csrf]").attr('content');
+      console.log(event.target.id);
       $.ajax({
         url: path,
         type: 'POST',
-        data: { _csrf_token: csrf, _method: 'delete' }
-      }).done( function (data) {
-
+        data: { _csrf_token: csrf, _method: 'delete' },
+        success: function(data) {
+          this.setState(function(state) {
+            state.tasks.splice(taskIndex, 1);
+            return { tasks: state.tasks };
+          });
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error("Can't delete");
+        }.bind(this)
       });
     }
-
-    var taskIndex = parseInt(event.target.id, 10);
-    this.setState(function(state) {
-      state.tasks.splice(taskIndex, 1);
-      return { tasks: state.tasks };
+  },
+  onChange(event) {
+    this.setState({task: event.target.value});
+  },
+  addTask(event) {
+    var item = {
+      id: 666,
+      name: this.state.task
+    };
+    this.setState({
+      tasks: this.state.tasks.concat([item]),
+      task: ''
     });
+
+    event.preventDefault();
   },
   render() {
     return (
       <table key={this.props.id} className="table">
         <caption>{this.props.name}</caption>
         <thead><tr><th>Task</th><th></th></tr></thead>
+        <tfoot><tr>
+        <td></td>
+        <td className="text-right">
+          <form onSubmit={this.addTask}>
+            <input onChange={this.onChange} type="text" name="name" value={this.state.task} />
+            <button>Add task</button>
+          </form>
+        </td>
+        </tr></tfoot>
         <tbody>
         {this.state.tasks.map(function(task, taskIndex) {
           return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} />
