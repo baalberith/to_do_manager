@@ -13,19 +13,54 @@
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
 import $ from "jquery"
-// import React from "react"
-// import ReactDOM from "react-dom"
+import React from "react"
+import ReactDOM from "react-dom"
 
-// class HelloWorld extends React.Component {
+const HelloWorld = React.createClass({
+  getDefaultProps() {
+    return {
+      message: "The default message",
+      name: "The dafault name"
+    }
+  },
+
+  render() {
+    return (
+        <p>{this.props.data.message} {this.props.data.name}</p>
+    )
+  }
+})
+
+var hello_props = $("#hello-props").attr("data-props");
+if (hello_props) {
+  var data = JSON.parse(hello_props);
+
+  ReactDOM.render(
+      <HelloWorld data={data} />, $("#hello-component")[0])
+}
+
+// const { string } = React.PropTypes
+
+// const HelloWorld = React.createClass({
+
+//   propTypes: {
+//     message: string.isRequired
+//   },
+
+//   getDefaultProps() {
+//     return {
+//       message: "The default message"
+//     }
+//   },
+
 //   render() {
-//     return (<h1>Hello World!</h1>)
-//   }
-// }
+//     const { message } = this.props
 
-// ReactDOM.render(
-//     <HelloWorld/>,
-//   document.getElementById("hello-world")
-// )
+//     return (
+//         <p>{message}</p>
+//     )
+//   }
+// })
 
 $('#complete_selected').click(function(){
   var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();

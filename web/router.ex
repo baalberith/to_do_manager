@@ -32,6 +32,7 @@ defmodule ToDoManager.Router do
   scope "/", ToDoManager do
     pipe_through [:browser, :browser_auth]
 
+    get "/", PageController, :index
     resources "/users", UserController, only: [:delete]
 
     resources "/lists", ListController do

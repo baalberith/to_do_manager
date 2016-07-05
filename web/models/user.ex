@@ -10,6 +10,8 @@ defmodule ToDoManager.User do
     timestamps
   end
 
+  # @derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
+
   @required_fields ~w(email password_hash) 
   @optional_fields ~w()
 
