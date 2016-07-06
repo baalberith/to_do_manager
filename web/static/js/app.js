@@ -20,7 +20,8 @@ const Task = React.createClass({
   render() {
     return (
       <tr>
-        <td><input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" name="tasks_to_complete[]" value={this.props.task.id} /></td>
+        <td><input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" name="to_complete[]" value={this.props.task.id} /></td>
+        <td><input data-number={this.props.value} onClick={this.props.onDelChbxClick} type="checkbox" name="to_delete[]" value={this.props.task.id} /></td>
         <td>{this.props.task.name}</td>
         <td>{this.props.task.completed ? "Completed" : this.props.task.date}</td>
         <td className="text-right"><button data-number={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
@@ -33,7 +34,7 @@ const NewTask = React.createClass({
   render() {
     return (
         <form onSubmit={this.props.addTask}>
-        <table className="table"><tbody><tr>
+        <table className="table"><thead><tr><th>Name</th><th>Due date</th><th></th></tr></thead><tbody><tr>
         <td><input onChange={this.props.onNameChange} type="text" name="name" value={this.props.task.name} />
         <span className="help-block">{this.props.errors.name}</span></td>
         <td><input onChange={this.props.onDateChange} type="date" name="date" value={this.props.task.date} /><span className="help-block">{this.props.errors.date}</span></td>
@@ -60,13 +61,22 @@ const ListApp = React.createClass({
   },
   onCompChbxClick(event) {
     var taskIndex = parseInt(event.target.dataset.number, 10);
-    if (this.state.tasks[taskIndex].to_complete == undefined) {
-      this.state.tasks[taskIndex].to_complete = true;
+    if (this.state.tasks[taskIndex].toComplete == undefined) {
+      this.state.tasks[taskIndex].toComplete = true;
     } else {
-      this.state.tasks[taskIndex].to_complete = !(this.state.tasks[taskIndex].to_complete);
+      this.state.tasks[taskIndex].toComplete = !(this.state.tasks[taskIndex].toComplete);
     }
     this.setState({tasks: this.state.tasks});
-    console.log(this.state.tasks[taskIndex]);
+  },
+  onDelChbxClick(event) {
+    var taskIndex = parseInt(event.target.dataset.number, 10);
+    if (this.state.tasks[taskIndex].toDelete == undefined) {
+      this.state.tasks[taskIndex].toDelete = true;
+    } else {
+      this.state.tasks[taskIndex].toDelete = !(this.state.tasks[taskIndex].toDelete);
+    }
+    this.setState({tasks: this.state.tasks});
+    console.log(this.state.tasks);
   },
   deleteTask(event) {
     var taskIndex = parseInt(event.target.dataset.number, 10);
@@ -92,7 +102,7 @@ const ListApp = React.createClass({
   addTask(event) {
     var path = $(location).attr('pathname') + '/tasks';
     var csrf = $("meta[name=csrf]").attr('content');
-    var new_task = {
+    var newTask = {
       name: this.state.task.name,
       date: this.state.task.date,
       list_id: this.props.list.id,
@@ -101,7 +111,7 @@ const ListApp = React.createClass({
     $.ajax({
       url: path,
       type: 'POST',
-      data: { _csrf_token: csrf, task: new_task },
+      data: { _csrf_token: csrf, task: newTask },
       success: function(data) {
         this.state.errors = { name: '', date: '' };
         if (data.valid) {
@@ -126,12 +136,12 @@ const ListApp = React.createClass({
     event.preventDefault();
   },
   completeSelectedTasks() {
-    var tasks_to_complete = [];
+    var tasksToComplete = [];
+    var tasksNumbers = [];
     for (var taskIndex = 0; taskIndex < this.state.tasks.length; taskIndex++) {
-      if (this.state.tasks[taskIndex].to_complete && !(this.state.tasks[taskIndex].completed)) {
-        this.state.tasks[taskIndex].completed = true;
-        this.setState({ tasks: this.state.tasks });
-        tasks_to_complete.push(this.state.tasks[taskIndex].id);
+      if (this.state.tasks[taskIndex].toComplete && !(this.state.tasks[taskIndex].completed)) {
+        tasksToComplete.push(this.state.tasks[taskIndex].id);
+        tasksNumbers.push(taskIndex);
       }
     }
     var path = $(location).attr('pathname') + '/tasks/complete_tasks';
@@ -139,26 +149,61 @@ const ListApp = React.createClass({
     $.ajax({
       url: path,
       type: 'POST',
-      data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks_to_complete }
-    }).done( function (data) {
-;
+      data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasksToComplete },
+      success: function(data) {
+        for (let taskIndex of tasksNumbers) {
+          this.state.tasks[taskIndex].completed = true;
+          this.setState({ tasks: this.state.tasks });
+        }
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("Can't complete selected tasks.");
+      }.bind(this)
     });
     event.preventDefault();
-
-    console.log(tasks_to_complete);
+  },
+  deleteSelectedTasks() {
+    if (confirm("Are you sure?")) {
+      var tasksToDelete = [];
+      var tasksNumbers = [];
+      for (var taskIndex = 0; taskIndex < this.state.tasks.length; taskIndex++) {
+        if (this.state.tasks[taskIndex].toDelete) {
+          tasksToDelete.push(this.state.tasks[taskIndex].id);
+          tasksNumbers.push(taskIndex);
+        }
+      }
+      var path = $(location).attr('pathname') + '/tasks/delete_tasks';
+      var csrf = $("meta[name=csrf]").attr('content');
+      $.ajax({
+        url: path,
+        type: 'POST',
+        data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasksToDelete },
+        success: function(data) {
+          for (var i = tasksNumbers.length - 1; i >= 0; i--) {
+            this.state.tasks.splice(tasksNumbers[i], 1);
+            this.setState({ tasks: this.state.tasks });
+          }
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error("Can't delete selected tasks.");
+        }.bind(this)
+      });
+    }
+    event.preventDefault();
   },
   render() {
     return (
       <div>
       <table key={this.props.list.id} className="table">
         <caption>{this.props.list.name}</caption>
-        <thead><tr><th>C</th><th>Task</th><th>Due date</th><th></th></tr></thead>
+        <thead><tr><th>Complete</th><th>Delete</th><th>Task</th><th>Due date</th><th></th></tr></thead>
         <tfoot><tr>
-        <td><button onClick={this.completeSelectedTasks}>C</button></td>
+        <td>{this.state.tasks.length > 0 ? <button onClick={this.completeSelectedTasks}>✓</button> : ""}</td>
+        <td>{this.state.tasks.length > 0 ? <button onClick={this.deleteSelectedTasks}>✓</button> : ""}</td>
         <td></td><td></td><td></td></tr></tfoot>
         <tbody>
         {this.state.tasks.map(function(task, taskIndex) {
-          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} onCompChbxClick={this.onCompChbxClick} />
+          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} onCompChbxClick={this.onCompChbxClick} onDelChbxClick={this.onDelChbxClick} />
           }.bind(this))}
         </tbody>
       </table>
@@ -167,45 +212,11 @@ const ListApp = React.createClass({
   }
 });
 
-
-var list_props = $("#list-props").attr("data-props");
-if (list_props) {
+var listProps = $("#list-props").attr("data-props");
+if (listProps) {
   ReactDOM.render(
-      <ListApp list={JSON.parse(list_props)} />, $("#list-component")[0])
+    <ListApp list={JSON.parse(listProps)} />, $("#list-component")[0])
 }
-
-
-// $('#complete_selected').click(function(){
-//   var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();
-//   var path = $(location).attr('pathname') + '/tasks/complete_tasks';
-//   var csrf = $("meta[name=csrf]").attr('content');
-//   $.ajax({
-//     url: path,
-//     type: 'POST',
-//     data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks }
-//   }).done( function (data) {
-//     // window.location = data.location;
-//     $(location).attr('pathname', data.location);
-//     $("#info").html(data.info);
-//   });
-// });
-
-// $('#delete_selected').click(function(){
-//   if (confirm("Are you sure?")) {
-//     var tasks = $("input[name='tasks_to_delete[]']:checked").map(function () { return this.value; }).get();
-//     var path = $(location).attr('pathname') + '/tasks/delete_tasks';
-//     var csrf = $("meta[name=csrf]").attr('content');
-//     $.ajax({
-//       url: path,
-//       type: 'POST',
-//       data: { _csrf_token: csrf, _method: 'delete', tasks_to_delete: tasks }
-//     }).done( function (data) {
-//       // window.location = data.location;
-//       $(location).attr('pathname', data.location);
-//       $("#info").html(data.info);
-//     });
-//   }
-// });
 
 // Import local files
 //

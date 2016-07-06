@@ -31,24 +31,6 @@ defmodule ToDoManager.TaskController do
     end
   end
 
-  # def new(conn, %{"list_id" => list_id}) do
-  #   changeset = Task.changeset(%Task{})
-  #   render(conn, "new.html", changeset: changeset, list_id: list_id)
-  # end
-
-  # def create(conn, %{"list_id" => list_id, "task" => task_params}) do
-  #   changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
-
-  #   case Repo.insert(changeset) do
-  #     {:ok, _task} ->
-  #       conn
-  #       |> put_flash(:info, "Task created successfully.")
-  #       |> redirect(to: list_path(conn, :show, list_id))
-  #     {:error, changeset} ->
-  #       render(conn, "new.html", changeset: changeset, list_id: list_id)
-  #   end
-  # end
-
   def edit(conn, %{"id" => id}) do
     task = Repo.get!(Task, id)
     changeset = Task.changeset(task)
@@ -71,7 +53,6 @@ defmodule ToDoManager.TaskController do
 
   def delete(conn, %{"list_id" => list_id, "id" => id}) do
     task = Repo.get!(Task, id)
-
     Repo.delete!(task)
 
     conn
@@ -90,7 +71,7 @@ defmodule ToDoManager.TaskController do
   end
 
   def complete_tasks(conn, %{"list_id" => list_id}) do
-    json conn, %{location: list_path(conn, :show, list_id), info: "Nothing to complete.."}
+    json conn, %{location: list_path(conn, :show, list_id), info: "Nothing to complete."}
   end
 
   def delete_tasks(conn, %{"list_id" => list_id, "tasks_to_delete" => tasks_to_delete}) do
