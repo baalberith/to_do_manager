@@ -11,8 +11,8 @@ defmodule ToDoManager.Task do
     timestamps
   end
 
-  @required_fields ~w(name list_id completed)
-  @optional_fields ~w(date)
+  @required_fields ~w(name date list_id completed)
+  @optional_fields ~w()
 
   @doc """
   Creates a changeset based on the `model` and `params`.

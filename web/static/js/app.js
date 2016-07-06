@@ -28,13 +28,34 @@ const Task = React.createClass({
   }
 });
 
-const List = React.createClass({
+const NewTask = React.createClass({
+  render() {
+    return (
+        <form onSubmit={this.props.addTask}>
+        <table className="table"><tbody><tr>
+        <td><input onChange={this.props.onNameChange} type="text" name="name" value={this.props.task.name} />
+        <span className="help-block">{this.props.errors.name}</span></td>
+        <td><input onChange={this.props.onDateChange} type="date" name="date" value={this.props.task.date} /><span className="help-block">{this.props.errors.date}</span></td>
+        <td className="text-right"><button>Add task</button></td>
+        </tr></tbody></table>
+        </form>
+    );
+  }
+});
+
+const ListApp = React.createClass({
   getInitialState() {
     return {
       tasks: this.props.list.tasks,
-      task: '',
-      errors: { name: '' }
+      task: { name: '', date: '' },
+      errors: { name: '', date: '' }
     }
+  },
+  onNameChange(event) {
+    this.setState({task: {name: event.target.value, date: this.state.task.date}});
+  },
+  onDateChange(event) {
+    this.setState({task: {name: this.state.task.name, date: event.target.value}});
   },
   deleteTask(event) {
     var taskIndex = parseInt(event.target.id, 10);
@@ -57,14 +78,12 @@ const List = React.createClass({
       });
     }
   },
-  onChange(event) {
-    this.setState({task: event.target.value});
-  },
   addTask(event) {
     var path = $(location).attr('pathname') + '/tasks';
     var csrf = $("meta[name=csrf]").attr('content');
     var new_task = {
-      name: this.state.task,
+      name: this.state.task.name,
+      date: this.state.task.date,
       list_id: this.props.list.id,
       completed: false
     };
@@ -73,11 +92,11 @@ const List = React.createClass({
       type: 'POST',
       data: { _csrf_token: csrf, task: new_task },
       success: function(data) {
-        this.state.errors = { name: '' };
+        this.state.errors = { name: '', date: '' };
         if (data.valid) {
           this.setState({
-            tasks: this.state.tasks.concat([{id: data.task.id, name: data.task.name}]),
-            task: ''
+            tasks: this.state.tasks.concat([{id: data.task.id, name: data.task.name, date: data.task.date }]),
+            task: { name: '', date: '' }
           });
         } else {
           for (let error of data.errors) {
@@ -93,63 +112,32 @@ const List = React.createClass({
         console.error("Can't create new task.");
       }.bind(this)
     });
-
     event.preventDefault();
   },
   render() {
     return (
+      <div>
       <table key={this.props.list.id} className="table">
         <caption>{this.props.list.name}</caption>
         <thead><tr><th>Task</th><th>Due date</th><th></th></tr></thead>
-        <tfoot><tr>
-        <td></td>
-        <td></td>
-        <td className="text-right">
-          <form onSubmit={this.addTask}>
-        <input onChange={this.onChange} type="text" name="name" value={this.state.task} />
-        <span className="help-block">{this.state.errors.name}</span>
-            <button>Add task</button>
-          </form>
-        </td>
-        </tr></tfoot>
         <tbody>
         {this.state.tasks.map(function(task, taskIndex) {
           return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} />
           }.bind(this))}
         </tbody>
       </table>
+        <NewTask addTask={this.addTask} onNameChange={this.onNameChange} onDateChange={this.onDateChange} task={this.state.task} errors={this.state.errors} /></div>
     )
   }
 });
 
+
 var list_props = $("#list-props").attr("data-props");
 if (list_props) {
   ReactDOM.render(
-      <List list={JSON.parse(list_props)} />, $("#list-component")[0])
+      <ListApp list={JSON.parse(list_props)} />, $("#list-component")[0])
 }
 
-// const { string } = React.PropTypes
-
-// const HelloWorld = React.createClass({
-
-//   propTypes: {
-//     message: string.isRequired
-//   },
-
-//   getDefaultProps() {
-//     return {
-//       message: "The default message"
-//     }
-//   },
-
-//   render() {
-//     const { message } = this.props
-
-//     return (
-//         <p>{message}</p>
-//     )
-//   }
-// })
 
 // $('#complete_selected').click(function(){
 //   var tasks = $("input[name='tasks_to_complete[]']:checked").map(function () { return this.value; }).get();
