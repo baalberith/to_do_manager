@@ -20,9 +20,10 @@ const Task = React.createClass({
   render() {
     return (
       <tr>
+        <td><input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" name="tasks_to_complete[]" value={this.props.task.id} /></td>
         <td>{this.props.task.name}</td>
-        <td>{this.props.task.date}</td>
-        <td className="text-right"><button id={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
+        <td>{this.props.task.completed ? "Completed" : this.props.task.date}</td>
+        <td className="text-right"><button data-number={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
       </tr>
     )
   }
@@ -48,7 +49,7 @@ const ListApp = React.createClass({
     return {
       tasks: this.props.list.tasks,
       task: { name: '', date: '' },
-      errors: { name: '', date: '' }
+      errors: { name: '', date: '' },
     }
   },
   onNameChange(event) {
@@ -57,8 +58,18 @@ const ListApp = React.createClass({
   onDateChange(event) {
     this.setState({task: {name: this.state.task.name, date: event.target.value}});
   },
+  onCompChbxClick(event) {
+    var taskIndex = parseInt(event.target.dataset.number, 10);
+    if (this.state.tasks[taskIndex].to_complete == undefined) {
+      this.state.tasks[taskIndex].to_complete = true;
+    } else {
+      this.state.tasks[taskIndex].to_complete = !(this.state.tasks[taskIndex].to_complete);
+    }
+    this.setState({tasks: this.state.tasks});
+    console.log(this.state.tasks[taskIndex]);
+  },
   deleteTask(event) {
-    var taskIndex = parseInt(event.target.id, 10);
+    var taskIndex = parseInt(event.target.dataset.number, 10);
     if (confirm("Are you sure?")) {
       var path = $(location).attr('pathname') + '/tasks/' + event.target.value;
       var csrf = $("meta[name=csrf]").attr('content');
@@ -114,15 +125,40 @@ const ListApp = React.createClass({
     });
     event.preventDefault();
   },
+  completeSelectedTasks() {
+    var tasks_to_complete = [];
+    for (var taskIndex = 0; taskIndex < this.state.tasks.length; taskIndex++) {
+      if (this.state.tasks[taskIndex].to_complete && !(this.state.tasks[taskIndex].completed)) {
+        this.state.tasks[taskIndex].completed = true;
+        this.setState({ tasks: this.state.tasks });
+        tasks_to_complete.push(this.state.tasks[taskIndex].id);
+      }
+    }
+    var path = $(location).attr('pathname') + '/tasks/complete_tasks';
+    var csrf = $("meta[name=csrf]").attr('content');
+    $.ajax({
+      url: path,
+      type: 'POST',
+      data: { _csrf_token: csrf, _method: 'patch', tasks_to_complete: tasks_to_complete }
+    }).done( function (data) {
+;
+    });
+    event.preventDefault();
+
+    console.log(tasks_to_complete);
+  },
   render() {
     return (
       <div>
       <table key={this.props.list.id} className="table">
         <caption>{this.props.list.name}</caption>
-        <thead><tr><th>Task</th><th>Due date</th><th></th></tr></thead>
+        <thead><tr><th>C</th><th>Task</th><th>Due date</th><th></th></tr></thead>
+        <tfoot><tr>
+        <td><button onClick={this.completeSelectedTasks}>C</button></td>
+        <td></td><td></td><td></td></tr></tfoot>
         <tbody>
         {this.state.tasks.map(function(task, taskIndex) {
-          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} />
+          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} onCompChbxClick={this.onCompChbxClick} />
           }.bind(this))}
         </tbody>
       </table>
