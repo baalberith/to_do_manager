@@ -21,6 +21,7 @@ const Task = React.createClass({
     return (
       <tr>
         <td>{this.props.task.name}</td>
+        <td>{this.props.task.date}</td>
         <td className="text-right"><button id={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
       </tr>
     )
@@ -32,6 +33,7 @@ const List = React.createClass({
     return {
       tasks: this.props.list.tasks,
       task: '',
+      errors: { name: '' }
     }
   },
   deleteTask(event) {
@@ -70,12 +72,22 @@ const List = React.createClass({
       url: path,
       type: 'POST',
       data: { _csrf_token: csrf, task: new_task },
-      success: function(json) {
-        var data = JSON.parse(json);
-        this.setState({
-          tasks: this.state.tasks.concat([{id: data.id, name: data.name}]),
-          task: ''
-        });
+      success: function(data) {
+        this.state.errors = { name: '' };
+        if (data.valid) {
+          this.setState({
+            tasks: this.state.tasks.concat([{id: data.task.id, name: data.task.name}]),
+            task: ''
+          });
+        } else {
+          for (let error of data.errors) {
+            var value = this.state.errors[error.field];
+            this.state.errors[error.field] = value + "\n" + error.detail;
+          }
+          this.setState({
+            errors: this.state.errors
+          })
+        }
       }.bind(this),
       error: function(xhr, status, err) {
         console.error("Can't create new task.");
@@ -88,12 +100,14 @@ const List = React.createClass({
     return (
       <table key={this.props.list.id} className="table">
         <caption>{this.props.list.name}</caption>
-        <thead><tr><th>Task</th><th></th></tr></thead>
+        <thead><tr><th>Task</th><th>Due date</th><th></th></tr></thead>
         <tfoot><tr>
+        <td></td>
         <td></td>
         <td className="text-right">
           <form onSubmit={this.addTask}>
-            <input onChange={this.onChange} type="text" name="name" value={this.state.task} />
+        <input onChange={this.onChange} type="text" name="name" value={this.state.task} />
+        <span className="help-block">{this.state.errors.name}</span>
             <button>Add task</button>
           </form>
         </td>
@@ -110,10 +124,8 @@ const List = React.createClass({
 
 var list_props = $("#list-props").attr("data-props");
 if (list_props) {
-  var data = JSON.parse(list_props);
-
   ReactDOM.render(
-      <List list={data} />, $("#list-component")[0])
+      <List list={JSON.parse(list_props)} />, $("#list-component")[0])
 }
 
 // const { string } = React.PropTypes

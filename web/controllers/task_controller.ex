@@ -7,21 +7,34 @@ defmodule ToDoManager.TaskController do
 
   plug :scrub_params, "task" when action in [:create, :update]
 
-  def new(conn, %{"list_id" => list_id}) do
-    changeset = Task.changeset(%Task{})
-    render(conn, "new.html", changeset: changeset, list_id: list_id)
-  end
-
   def create(conn, %{"list_id" => list_id, "task" => task_params}) do
     changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
 
     case Repo.insert(changeset) do
       {:ok, task} ->
-        json conn, Poison.encode!(task)
-      {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset, list_id: list_id)
+        json conn, %{valid: true, task: task}
+      {:error, _changeset} ->
+        json conn, %{valid: false, errors: serialize_errors(changeset.errors)}
     end
   end
+
+  defp serialize_errors(errors) do
+    errors = for {field, detail} <- errors, do: %{field: field, detail: render_detail(detail)}
+  end
+  defp render_detail(detail) do
+    case detail do
+      {message, values} ->
+        Enum.reduce(values, message, fn {k, v}, acc ->
+          String.replace(acc, "%{#{k}}", to_string(v)) end)
+      message ->
+        message
+    end
+  end
+
+  # def new(conn, %{"list_id" => list_id}) do
+  #   changeset = Task.changeset(%Task{})
+  #   render(conn, "new.html", changeset: changeset, list_id: list_id)
+  # end
 
   # def create(conn, %{"list_id" => list_id, "task" => task_params}) do
   #   changeset = Task.changeset(%Task{list_id: String.to_integer(list_id)}, task_params)
