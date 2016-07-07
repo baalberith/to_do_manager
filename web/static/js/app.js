@@ -24,7 +24,9 @@ const Task = React.createClass({
         <td><input data-number={this.props.value} onClick={this.props.onDelChbxClick} type="checkbox" name="to_delete[]" value={this.props.task.id} /></td>
         <td>{this.props.task.name}</td>
         <td>{this.props.task.completed ? "Completed" : this.props.task.date}</td>
-        <td className="text-right"><button data-number={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
+        <td className="text-right">
+        <button data-number={this.props.value} onClick={this.props.onEditTask} name="task" value={this.props.task.id}> Edit </button>
+        <button data-number={this.props.value} onClick={this.props.deleteTask} name="task" value={this.props.task.id}> Delete </button></td>
       </tr>
     )
   }
@@ -33,12 +35,12 @@ const Task = React.createClass({
 const NewTask = React.createClass({
   render() {
     return (
-        <form onSubmit={this.props.addTask}>
+        <form onSubmit={this.props.toEdit ? this.props.editTask : this.props.addTask}>
         <table className="table"><thead><tr><th>Name</th><th>Due date</th><th></th></tr></thead><tbody><tr>
         <td><input onChange={this.props.onNameChange} type="text" name="name" value={this.props.task.name} />
         <span className="help-block">{this.props.errors.name}</span></td>
         <td><input onChange={this.props.onDateChange} type="date" name="date" value={this.props.task.date} /><span className="help-block">{this.props.errors.date}</span></td>
-        <td className="text-right"><button>Add task</button></td>
+        <td className="text-right"><button>{this.props.toEdit ? "Edit task" : "Add task"}</button></td>
         </tr></tbody></table>
         </form>
     );
@@ -51,6 +53,7 @@ const ListApp = React.createClass({
       tasks: this.props.list.tasks,
       task: { name: '', date: '' },
       errors: { name: '', date: '' },
+      toEdit: undefined
     }
   },
   onNameChange(event) {
@@ -78,6 +81,55 @@ const ListApp = React.createClass({
     this.setState({tasks: this.state.tasks});
     console.log(this.state.tasks);
   },
+  onEditTask(event) {
+    var taskIndex = parseInt(event.target.dataset.number, 10);
+    this.setState(
+      {task: {
+        name: this.state.tasks[taskIndex].name,
+        date: this.state.tasks[taskIndex].date,
+      },
+       toEdit: {index: taskIndex, id: event.target.value}
+      });
+  },
+  editTask(event) {
+    console.log(this.state.toEdit);
+    var path = $(location).attr('pathname') + '/tasks/' + this.state.toEdit.id;
+    var csrf = $("meta[name=csrf]").attr('content');
+    var newTask = {
+      name: this.state.task.name,
+      date: this.state.task.date,
+      list_id: this.props.list.id,
+      completed: false
+    };
+    $.ajax({
+      url: path,
+      type: 'POST',
+      data: { _csrf_token: csrf, _method: "patch", task: newTask },
+      success: function(data) {
+        this.state.errors = { name: '', date: '' };
+        if (data.valid) {
+          this.state.tasks[this.state.toEdit.index] = {id: data.task.id, name: data.task.name, date: data.task.date }
+          this.setState({
+            tasks: this.state.tasks,
+            task: { name: '', date: '' },
+            toEdit: undefined
+          });
+        } else {
+          for (let error of data.errors) {
+            var value = this.state.errors[error.field];
+            this.state.errors[error.field] = value + "\n" + error.detail;
+          }
+          this.setState({
+            errors: this.state.errors
+          })
+        }
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error("Can't create new task.");
+      }.bind(this)
+    });
+    event.preventDefault();
+  },
   deleteTask(event) {
     var taskIndex = parseInt(event.target.dataset.number, 10);
     if (confirm("Are you sure?")) {
@@ -100,6 +152,7 @@ const ListApp = React.createClass({
     }
   },
   addTask(event) {
+    console.log(event.target);
     var path = $(location).attr('pathname') + '/tasks';
     var csrf = $("meta[name=csrf]").attr('content');
     var newTask = {
@@ -153,6 +206,7 @@ const ListApp = React.createClass({
       success: function(data) {
         for (let taskIndex of tasksNumbers) {
           this.state.tasks[taskIndex].completed = true;
+          this.state.tasks[taskIndex].toComplete = true;
           this.setState({ tasks: this.state.tasks });
         }
       }.bind(this),
@@ -203,11 +257,11 @@ const ListApp = React.createClass({
         <td></td><td></td><td></td></tr></tfoot>
         <tbody>
         {this.state.tasks.map(function(task, taskIndex) {
-          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} onCompChbxClick={this.onCompChbxClick} onDelChbxClick={this.onDelChbxClick} />
+          return <Task key={task.id} task={task} value={taskIndex} deleteTask={this.deleteTask} onEditTask={this.onEditTask} onCompChbxClick={this.onCompChbxClick} onDelChbxClick={this.onDelChbxClick} />
           }.bind(this))}
         </tbody>
       </table>
-        <NewTask addTask={this.addTask} onNameChange={this.onNameChange} onDateChange={this.onDateChange} task={this.state.task} errors={this.state.errors} /></div>
+        <NewTask addTask={this.addTask} editTask={this.editTask} onNameChange={this.onNameChange} onDateChange={this.onDateChange} task={this.state.task} errors={this.state.errors} toEdit={this.state.toEdit} /></div>
     )
   }
 });
