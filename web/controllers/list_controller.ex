@@ -37,6 +37,16 @@ defmodule ToDoManager.ListController do
 
   def show(conn, %{"id" => id}) do
     user = Guardian.Plug.current_resource(conn)
+
+    # tasks_query = from l in my_lists(user),
+    #   full_join: t in assoc(l, :tasks),
+    #   where: l.id == ^id,
+    #   order_by: t.id,
+    #   select: %{id: l.id, name: l.name, user_id: l.user_id, tasks: t}
+
+    # Logger.debug("AAAAAAAAAAAAAAAAAA: #{inspect(Repo.all(tasks_query))}")
+    # Logger.debug("AAAAAAAAAAAAAAAAAA: #{inspect(Repo.get(my_lists(user), id) )}")
+
     case Repo.get(my_lists(user), id) do
       nil ->
         conn

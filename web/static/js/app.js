@@ -23,10 +23,10 @@ const Task = React.createClass({
     return (
       <tr>
         <td>
-          <input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" name="to_complete[]" value={this.props.task.id} />
+          <input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" value={this.props.task.id} />
         </td>
         <td>
-          <input data-number={this.props.value} onClick={this.props.onDelChbxClick} type="checkbox" name="to_delete[]" value={this.props.task.id} />
+          <input data-number={this.props.value} onClick={this.props.onDelChbxClick} type="checkbox" value={this.props.task.id} />
         </td>
         <td>
           {this.props.task.name}
@@ -62,7 +62,7 @@ const NewTask = React.createClass({
                 <span className="help-block">{this.props.errors.name}</span>
               </td>
               <td>
-                <input onChange={this.props.onDateChange} type="date" name="date" value={this.props.task.date} />
+        <input onChange={this.props.onDateChange} type="date" name="date" value={this.props.task.date} placeholder="rrrr-mm-dd" />
                 <span className="help-block">{this.props.errors.date}</span>
               </td>
               <td className="text-right">
@@ -167,7 +167,9 @@ const ListApp = React.createClass({
         };
 
         if (data.valid) {
+          var toComplete = this.state.tasks[this.state.toEdit.index].toComplete;
           this.state.tasks[this.state.toEdit.index] = data.task;
+          this.state.tasks[this.state.toEdit.index].toComplete = toComplete;
 
           this.setState({
             tasks: this.state.tasks,
@@ -248,7 +250,6 @@ const ListApp = React.createClass({
         };
 
         if (data.valid) {
-          console.log(data.task);
           this.setState({
             tasks: this.state.tasks.concat([data.task]),
             task: {
@@ -298,7 +299,6 @@ const ListApp = React.createClass({
       success: function(data) {
         for (let taskIndex of tasksNumbers) {
           this.state.tasks[taskIndex].completed = true;
-          this.state.tasks[taskIndex].toComplete = false;
 
           this.setState({
             tasks: this.state.tasks
@@ -383,7 +383,7 @@ const ListApp = React.createClass({
               }.bind(this))}
             </tbody>
           </table>
-        <h4>New task:</h4>
+          <h4>New task:</h4>
           <NewTask addTask={this.addTask} editTask={this.editTask} onNameChange={this.onNameChange} onDateChange={this.onDateChange} task={this.state.task} errors={this.state.errors} toEdit={this.state.toEdit} />
         </div>
     )
@@ -391,11 +391,10 @@ const ListApp = React.createClass({
 });
 
 var listProps = $("#list-props").attr("data-props");
+val listComp = $("#list-component");
 
-if (listProps) {
-  ReactDOM.render(
-    <ListApp list={JSON.parse(listProps)} />,
-    $("#list-component")[0])
+if (listProps && listComp) {
+  ReactDOM.render(<ListApp list={JSON.parse(listProps)} />, listComp[0])
 }
 
 // Import local files
