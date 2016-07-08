@@ -391,7 +391,7 @@ const ListApp = React.createClass({
 });
 
 var listProps = $("#list-props").attr("data-props");
-val listComp = $("#list-component");
+var listComp = $("#list-component");
 
 if (listProps && listComp) {
   ReactDOM.render(<ListApp list={JSON.parse(listProps)} />, listComp[0])
