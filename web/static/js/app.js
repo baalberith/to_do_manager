@@ -23,7 +23,7 @@ const Task = React.createClass({
     return (
       <tr>
         <td>
-          <input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" value={this.props.task.id} />
+        <input data-number={this.props.value} onClick={this.props.onCompChbxClick} type="checkbox" value={this.props.task.id} checked={this.props.task.toComplete && !(this.props.task.completed)}/>
         </td>
         <td>
           <input data-number={this.props.value} onClick={this.props.onDelChbxClick} type="checkbox" value={this.props.task.id} />
@@ -169,7 +169,8 @@ const ListApp = React.createClass({
         if (data.valid) {
           var toComplete = this.state.tasks[this.state.toEdit.index].toComplete;
           this.state.tasks[this.state.toEdit.index] = data.task;
-          this.state.tasks[this.state.toEdit.index].toComplete = toComplete;
+          // this.state.tasks[this.state.toEdit.index].toComplete = toComplete;
+          this.state.tasks[this.state.toEdit.index].toComplete = false;
 
           this.setState({
             tasks: this.state.tasks,

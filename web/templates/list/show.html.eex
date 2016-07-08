@@ -1,3 +1,4 @@
-  <div id="list-props" data-props='<%= Poison.encode!(@list) %>'>
-      <div id="list-component"></div>
-  </div>
+<div id="list-props" data-props='<%= Poison.encode!(@list) %>'>
+    <div id="list-component"></div>
+</div>
+<%= link "Back", to: list_path(@conn, :index) %>
